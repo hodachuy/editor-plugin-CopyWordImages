@@ -1,3 +1,6 @@
+@{ 
+    Layout = null;
+}
 <!DOCTYPE html>
 
 <html>
@@ -6,12 +9,21 @@
     <title>editor-plugin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
+    <!-- kendo -->
+    <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2021.1.330/styles/kendo.common.min.css" />
 </head>
 <body>
     <style>
-        .h-80{
-            min-height:80px;
-            height:auto;
+        .h-80 {
+            min-height: 80px;
+            height: auto;
+        }
+
+        pre {
+            white-space: pre-wrap;
+        }
+        .k-window-content{
+            background-color:#fff;
         }
     </style>
     <div class="container-fluid">
@@ -22,47 +34,62 @@
                 <p>Trong quá trình copy "chữ + hình ảnh" từ word, tệp hình ảnh đã được mã hóa sang base 64 với type là text/rtf  nhưng khi paste vào editor chỉ nhận là dạng plain/text hoặc text/html</p>
                 <p>Thư viện rtf.js để đọc nội dung text/rtf (Rich Text Format) khi copy và chuyển đổi lại sang html, nội dung này được lấy từ ClipboardData</p>
             </div>
+            <div class="col-md-6">
+                <img src="../Capture1.png" style="width:100%; height:60px;" />
+            </div>
+            <div class="col-md-6">
+                <img src="../Capture2.png" style="width:100%; height:60px;" />
+            </div>
         </div>
         <hr />
         <div class="row">
-            <div class="col-md-6 border-right border-back">
+            <div class="col-md-6">
                 <h5>1.Div editor contenteditable</h5>
                 <div id="txtEditor" class="w-100 h-80 border" contenteditable="true"></div>
-                <h5>2.Kendo Editor</h5>
-                <p>tương tự</p>
-                <h5>3.Tinymce Editor</h5>
-                <p>tương tự</p>
+                <br />
+                <h5>2.Kendo Editor "copy paste hình ảnh và chử từ word không có"</h5>
+                <br />
+                <div id="txtKendoEditor" class="w-100 h-80 border"></div>
+                <br />
+                <h5>3.Tinymce Editor "copy paste hình ảnh và chử từ word có tính phí"</h5>
+                <textarea id="txtMCEContent" class="w-100 h-80 border"></textarea>
             </div>
             <div class="col-md-6">
-                <p>Nội dung từ word</p>
-                <img src="../Capture1.png" alt="Hình ảnh demo" width="100" height="50"/>
-                <pre>
-                    <code class="languahe-js">
-        const KENDO_EDITOR = "KENDO_EDITOR";
-        const TINYMCE_EDITOR = "TINYMCE_EIDTOR";
-        const CK_EDITOR = "CK_EIDTOR";
-        // Copy hình và chữ từ word và paste tới editor
-        document.getElementById("txtEditor").onpaste = function (event) {
-            // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
-            event.preventDefault();
-            retrieveImageFromClipboardAsBase64('#txtEditor', event)
-        };
-        function retrieveImageFromClipboardAsBase64(elm, pasteEvent, pluginEditor, callback) {
-            pluginEditor = pluginEditor || "";
-            if (pasteEvent.clipboardData == false) {
-                if (typeof (callback) == "function") {
-                    callback(undefined);
-                }
+<pre>
+                <code class="html"><span class='regex-highlight wrapping'><</span><span class='regex-highlight wrapping'>div</span><span class='regex-highlight wrapping'> id=</span><span class='regex-highlight wrapping'>"txtEditor"</span> contenteditable=<span class='regex-highlight wrapping'>"true"</span>><span></</span><span>div</span><span>></span></code>
+                <code class="language-js">       
+                <span class="regex-highlight variable"><span><</span>script<span>></span></span>
+            const KENDO_EDITOR = "KENDO_EDITOR";
+            const TINYMCE_EDITOR = "TINYMCE_EIDTOR";
+            const CK_EDITOR = "CK_EIDTOR";
+
+            // Copy hình và chữ từ word và paste tới editor
+            document.getElementById("txtEditor").onpaste = function (event) {
+                // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
+                event.preventDefault();
+                retrieveImageFromClipboardAsBase64('#txtEditor', event);
             };
-            var items = pasteEvent.clipboardData.items;
-            if (items == undefined) {
-                if (typeof (callback) == "function") {
-                    callback(undefined);
-                }
-            };
-            for (var i = 0; i < items.length; i++) {
-                // text/rtf là nội dung copy từ word
-                if (items[i].type.indexOf('text/rtf') === 0) {
+
+            function retrieveImageFromClipboardAsBase64(elm, pasteEvent, pluginEditor, callback)
+            {
+                pluginEditor = pluginEditor || "";
+                if (pasteEvent.clipboardData == false) {
+                    if (typeof (callback) == "function") {
+                        callback(undefined);
+                    }
+                };
+
+                var items = pasteEvent.clipboardData.items;
+
+                if (items == undefined) {
+                    if (typeof (callback) == "function") {
+                        callback(undefined);
+                    }
+                };
+
+                for (var i = 0; i < items.length; i++) {
+                    // text/rtf là nội dung copy từ word
+                    if (items[i].type.indexOf('text/rtf') === 0) {
                     var rtf = pasteEvent.clipboardData.getData('text/rtf');
                     var stringToBinaryArray = function (txt) {
                         var buffer = new ArrayBuffer(txt.length);
@@ -72,6 +99,7 @@
                         }
                         return buffer;
                     }
+
                     // phương thức RTFJS.Document đọc nội dung tới html từ thư viện rtf.js
                     var doc = new RTFJS.Document(stringToBinaryArray(rtf), {});
                     doc.render()
@@ -79,73 +107,119 @@
                             const div = document.createElement("div");
                             div.append(...htmlElements);
 
-                            // xóa thẻ svg còn lại của word
-                            <span class="hljs-regexp">var pattFont = /<svg (.*?)<\/svg>/;</span>
-                            var regexFont = new RegExp(pattFont, "g");
-                            div.innerHTML = div.innerHTML.replace(regexFont, function (m) {
-                                return "";
-                            });
+                            // xóa thẻ svg còn lại của word nếu có
+                            div.<span class='regex-highlight variable'>innerHTML</span> = div.<span class='regex-highlight variable'>innerHTML</span>.<span class='regex-highlight function'>replace</span>(/<<span class='regex-highlight function'>svg</span> (.*?)<\ /svg>
+                            /g, <span class='regex-highlight wrapping'>''</span>);
 
                             // xóa nội dung Unsupported image format bên dưới hình ảnh
                             div.innerHTML = div.innerHTML.replace(/\[Unsupported image format\]/g, '');
 
-                            //convertImageFromFileWordWithBase64(div.innerHTML);
 
                             // =============================== Hiển thị lại văn bản ===============================//
-                            // 1. Cách 1 hiển thị lại văn bản word từ nội dung rtf, có nhiều chổ không giữ được format
+
+                            // 1. Cách 1 hiển thị lại văn bản word từ nội dung rtf,
+                            // có nhiều chổ không giữ được format word, nên làm với cách 2
                             switch (pluginEditor) {
-                                case KENDO_EDITOR:
-                                    break;
-                                case TINYMCE_EDITOR:
-                                    break;
-                                case CK_EDITOR:
-                                    break;
-                                default:
-                                    $(elm).html(div.innerHTML);
+                            case KENDO_EDITOR:
+                            break;
+                            case TINYMCE_EDITOR:
+                            break;
+                            case CK_EDITOR:
+                            break;
+                            default:
+                            $(elm).html(div.innerHTML);
                             }
 
-                            // 2.Cách 2 Cấu hình lấy format từ word của trình editor tích hợp,
-                            // chỉ lấy thẻ image base 64 trả về (có thể cấu hình đường dẫn để lưu lại file của mình) không lấy nội dung từ rtf,
-                            // sau đó append lại với các image local file:/C
+                            // 2. Cách 2 Chỉ lấy các thẻ image base 64 trả về và nội dung hiển thị giữ format word của trình editor tích hợp,
+                            // không lấy nội dung từ rtf.
+                            // 2. Cách 2 Cấu hình lấy format từ word của trình editor tích hợp,
+                            // chỉ lấy thẻ image base 64 trả về không lấy nội dung word của rtf trả về.
+                            // 2.1. Xử lý gọi ajax lưu hình base 64 => trả về hình ảnh đường dẫn từ server
+                            // 2.2. Từ nội dung có các thẻ đường dẫn file:///C xử lý repply lại với các image đó
+
                         })
                         .catch(function (error) {
                             console.log(error);
                             alert("Có hình ảnh không thể chuyển đổi, vui lòng chọn insert hình");
                         })
+                    }
                 }
             }
-        }
-                    </code>   
-                </pre>
+                <span><span><</span><span>/</span>script<span>></span></span>
+    </code>
+</pre>
             </div>
         </div>
-        
+
     </div>
-    
+
 
     <!--Jquery and library-->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
     <script src="https://tbluemel.github.io/rtf.js/dist/RTFJS.bundle.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
+    <script src="~/js/tinymce/tinymce.min.js"></script>    
+    <script src="http://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
+
+    <script>hljs.highlightAll();</script>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightBlock(block);
-            });
-        });
 
         const KENDO_EDITOR = "KENDO_EDITOR";
         const TINYMCE_EDITOR = "TINYMCE_EIDTOR";
         const CK_EDITOR = "CK_EIDTOR";
 
+        $(document).ready(function () {
+            // init kendo editor
+            var editor = $("#txtKendoEditor").kendoEditor({
+                tools: [
+                    "bold",
+                    "italic",
+                    "underline",
+                ]
+            });
+
+            // init tinymce
+            tinymce.init({
+                selector: '#txtMCEContent',
+                cleanup: true,
+                verify_html: true,
+                entity_encoding: "raw",
+                cleanup_on_startup: true,
+                height: '300px',
+                inline: false,
+                plugins: 'advlist autolink link image lists print preview code media table textcolor hr searchreplace wordcount autoresize fullscreen autoresize',
+                toolbar: "fontselect | bold italic underline | forecolor | fontsizeselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image searchreplace | link unlink | fullscreen",
+                fontsize_formats: "8pt 10pt 12pt 13pt 14pt 18pt 24pt 36pt",
+                skin: 'lightgray',
+                theme: 'modern',
+                languague: 'vi',
+                valid_elements: '+*[*]',
+                paste_data_images: true,
+                powerpaste_allow_local_images: true,
+                powerpaste_word_import: 'prompt',
+                powerpaste_html_import: 'prompt',
+                setup: function (editor) {
+                    editor.on("paste", function (e) {
+                        retrieveImageFromClipboardAsBase64('#txtKendoEditor', event)
+                    });
+
+                }
+            })
+        })
+
+
         // Copy hình và chữ từ word và paste tới editor
         document.getElementById("txtEditor").onpaste = function (event) {
-
             // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
             event.preventDefault();
-
             retrieveImageFromClipboardAsBase64('#txtEditor', event)
+        };
+
+        document.getElementById("txtKendoEditor").onpaste = function (event) {
+            // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
+            event.preventDefault();
+            retrieveImageFromClipboardAsBase64('#txtKendoEditor', event)
         };
 
         function retrieveImageFromClipboardAsBase64(elm, pasteEvent, pluginEditor, callback) {
@@ -185,13 +259,7 @@
                             const div = document.createElement("div");
                             div.append(...htmlElements);
 
-                            // xóa thẻ svg còn lại của word
-                            //var pattFont = /<svg (.*?)<\/svg>/;
-                            //var regexFont = new RegExp(pattFont, "g");
-                            //div.innerHTML = div.innerHTML.replace(regexFont, function (m) {
-                            //    return "";
-                            //});
-
+                            // xóa thẻ svg còn lại của word nếu có
                             div.innerHTML = div.innerHTML.replace(/<svg (.*?)<\/svg>/g, '');
 
                             // xóa nội dung Unsupported image format bên dưới hình ảnh
@@ -200,27 +268,33 @@
                             //convertImageFromFileWordWithBase64(div.innerHTML);
 
                             // =============================== Hiển thị lại văn bản ===============================//
-                            // 1. Cách 1 hiển thị lại văn bản word từ nội dung rtf, có nhiều chổ không giữ được format
+
+                            // 1. Cách 1 hiển thị lại văn bản word từ nội dung rtf,
+                            // có nhiều chổ không giữ được format word, nên làm với cách 2
                             switch (pluginEditor) {
-                                case KENDO_EDITOR:                                    
+                                case KENDO_EDITOR:
+                                    $(elm).data("kendoEditor").value(div.innerHTML);
                                     break;
                                 case TINYMCE_EDITOR:
-                                    break;
+                                    tinymce.get("txtMCEContent").getBody().innerHTML = div.innerHTML;
                                 case CK_EDITOR:
                                     break;
                                 default:
                                     $(elm).html(div.innerHTML);
                             }
 
-                            // 2.Cách 2 Cấu hình lấy format từ word của trình editor tích hợp,
-                            // chỉ lấy thẻ image base 64 trả về (có thể cấu hình đường dẫn để lưu lại file của mình) không lấy nội dung từ rtf,
-                            // sau đó append lại với các image local file:///C
+                            // 2. Cách 2 Chỉ lấy các thẻ image base 64 trả về và nội dung hiển thị giữ format word của trình editor tích hợp, không lấy nội dung từ rtf.
+                            // 2. Cách 2 Cấu hình lấy format từ word của trình editor tích hợp,
+                            // chỉ lấy thẻ image base 64 trả về không lấy nội dung word của rtf trả về.
+                            // 2.1. Xử lý gọi ajax lưu hình base 64 => trả về hình ảnh đường dẫn từ server
+                            // 2.2. Từ nội dung có các thẻ đường dẫn file:///C xử lý repply lại với các image đó
+
                         })
                         .catch(function (error) {
                             console.log(error);
-                            alert("Có hình ảnh không thể chuyển đổi, vui lòng chọn insert hình");                           
+                            alert("Có hình ảnh không thể chuyển đổi, vui lòng chọn insert hình");
                         })
-                }               
+                }
             }
         }
     </script>
