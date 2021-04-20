@@ -32,10 +32,10 @@
                 <p>Thư viện rtf.js để đọc nội dung text/rtf (Rich Text Format) khi copy và chuyển đổi lại sang html, nội dung này được lấy từ ClipboardData</p>
             </div>
             <div class="col-md-6">
-                <img src="https://hodachuy.github.io/editor_plugin/image/Capture1.PNG" style="width:100%; height:60px;" />
+                <img src="https://hodachuy.github.io/editor_plugin/image/Capture1.PNG" style="width:100%; height:260px;" />
             </div>
             <div class="col-md-6">
-                <img src="https://hodachuy.github.io/editor_plugin/image/Capture2.PNG" style="width:100%; height:60px;" />
+                <img src="https://hodachuy.github.io/editor_plugin/image/Capture2.PNG" style="width:100%; height:260px;" />
             </div>
         </div>
         <hr />
@@ -210,13 +210,13 @@
         document.getElementById("txtEditor").onpaste = function (event) {
             // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
             event.preventDefault();
-            retrieveImageFromClipboardAsBase64('#txtEditor', event, KENDO_EDITOR)
+            retrieveImageFromClipboardAsBase64('#txtEditor', event, 'KENDO_EDITOR')
         };
 
         document.getElementById("txtKendoEditor").onpaste = function (event) {
             // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
             event.preventDefault();
-            retrieveImageFromClipboardAsBase64('#txtKendoEditor', event, TINYMCE_EDITOR)
+            retrieveImageFromClipboardAsBase64('#txtKendoEditor', event, 'TINYMCE_EDITOR')
         };
 
         function retrieveImageFromClipboardAsBase64(elm, pasteEvent, pluginEditor, callback) {
