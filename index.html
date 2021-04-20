@@ -19,8 +19,9 @@
         pre {
             white-space: pre-wrap;
         }
-        .k-window-content{
-            background-color:#fff;
+
+        .k-window-content {
+            background-color: #fff;
         }
     </style>
     <div class="container-fluid">
@@ -49,24 +50,19 @@
                 <div id="txtKendoEditor" class="w-100 h-80 border"></div>
                 <br />
                 <h5>3.Tinymce Editor "copy paste hình ảnh và chữ từ word có tính phí"</h5>
-                <textarea id="txtMCEContent" class="w-100 h-80 border"></textarea>
+                <textarea id="txtMCEEditor" class="w-100 h-80 border"></textarea>
             </div>
             <div class="col-md-6">
 <pre>
                 <code class="html"><span class='regex-highlight wrapping'><</span><span class='regex-highlight wrapping'>div</span><span class='regex-highlight wrapping'> id=</span><span class='regex-highlight wrapping'>"txtEditor"</span> contenteditable=<span class='regex-highlight wrapping'>"true"</span>><span></</span><span>div</span><span>></span></code>
                 <code class="language-js">       
                 <span class="regex-highlight variable"><span><</span>script<span>></span></span>
-            const KENDO_EDITOR = "KENDO_EDITOR";
-            const TINYMCE_EDITOR = "TINYMCE_EIDTOR";
-            const CK_EDITOR = "CK_EIDTOR";
-
-            // Copy hình và chữ từ word và paste tới editor
+            // div editor
             document.getElementById("txtEditor").onpaste = function (event) {
                 // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
                 event.preventDefault();
                 retrieveImageFromClipboardAsBase64('#txtEditor', event);
             };
-
             function retrieveImageFromClipboardAsBase64(elm, pasteEvent, pluginEditor, callback)
             {
                 pluginEditor = pluginEditor || "";
@@ -75,15 +71,12 @@
                         callback(undefined);
                     }
                 };
-
                 var items = pasteEvent.clipboardData.items;
-
                 if (items == undefined) {
                     if (typeof (callback) == "function") {
                         callback(undefined);
                     }
                 };
-
                 for (var i = 0; i < items.length; i++) {
                     // text/rtf là nội dung copy từ word
                     if (items[i].type.indexOf('text/rtf') === 0) {
@@ -96,44 +89,36 @@
                         }
                         return buffer;
                     }
-
                     // phương thức RTFJS.Document đọc nội dung tới html từ thư viện rtf.js
                     var doc = new RTFJS.Document(stringToBinaryArray(rtf), {});
                     doc.render()
                         .then(function (htmlElements) {
                             const div = document.createElement("div");
                             div.append(...htmlElements);
-
                             // xóa thẻ svg còn lại của word nếu có
                             div.<span class='regex-highlight variable'>innerHTML</span> = div.<span class='regex-highlight variable'>innerHTML</span>.<span class='regex-highlight function'>replace</span>(/<<span class='regex-highlight function'>svg</span> (.*?)<\ /svg>
                             /g, <span class='regex-highlight wrapping'>''</span>);
-
                             // xóa nội dung Unsupported image format bên dưới hình ảnh
                             div.innerHTML = div.innerHTML.replace(/\[Unsupported image format\]/g, '');
-
-
                             // =============================== Hiển thị lại văn bản ===============================//
-
                             // 1. Cách 1 hiển thị lại văn bản word từ nội dung rtf,
                             // có nhiều chổ không giữ được format word, nên làm với cách 2
                             switch (pluginEditor) {
-                            case KENDO_EDITOR:
+                            case 'KENDO_EDITOR':
                             break;
-                            case TINYMCE_EDITOR:
+                            case 'TINYMCE_EDITOR':
                             break;
-                            case CK_EDITOR:
+                            case 'CK_EDITOR':
                             break;
                             default:
                             $(elm).html(div.innerHTML);
                             }
-
                             // 2. Cách 2 Chỉ lấy các thẻ image base 64 trả về và nội dung hiển thị giữ format word của trình editor tích hợp,
                             // không lấy nội dung từ rtf.
                             // 2. Cách 2 Cấu hình lấy format từ word của trình editor tích hợp,
                             // chỉ lấy thẻ image base 64 trả về không lấy nội dung word của rtf trả về.
                             // 2.1. Xử lý gọi ajax lưu hình base 64 => trả về hình ảnh đường dẫn từ server
                             // 2.2. Từ nội dung có các thẻ đường dẫn file:///C xử lý repply lại với các image đó
-
                         })
                         .catch(function (error) {
                             console.log(error);
@@ -156,16 +141,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
     <script src="https://tbluemel.github.io/rtf.js/dist/RTFJS.bundle.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
-    <script src="https://hodachuy.github.io/editor_plugin/js/tinymce/tinymce.min.js"></script>    
+    <script src="https://hodachuy.github.io/editor_plugin/js/tinymce/tinymce.min.js"></script>
     <script src="https://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
 
     <script>hljs.highlightAll();</script>
     <script>
-
-        const KENDO_EDITOR = "KENDO_EDITOR";
-        const TINYMCE_EDITOR = "TINYMCE_EIDTOR";
-        const CK_EDITOR = "CK_EIDTOR";
-
         $(document).ready(function () {
             // init kendo editor
             var editor = $("#txtKendoEditor").kendoEditor({
@@ -178,7 +158,7 @@
 
             // init tinymce
             tinymce.init({
-                selector: '#txtMCEContent',
+                selector: '#txtMCEEditor',
                 cleanup: true,
                 verify_html: true,
                 entity_encoding: "raw",
@@ -198,7 +178,7 @@
                 powerpaste_html_import: 'prompt',
                 setup: function (editor) {
                     editor.on("paste", function (e) {
-                        retrieveImageFromClipboardAsBase64('#txtKendoEditor', event)
+                        retrieveImageFromClipboardAsBase64('#txtMCEEditor', event, 'TINYMCE_EDITOR')
                     });
 
                 }
@@ -210,14 +190,15 @@
         document.getElementById("txtEditor").onpaste = function (event) {
             // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
             event.preventDefault();
-            retrieveImageFromClipboardAsBase64('#txtEditor', event, 'KENDO_EDITOR')
+            retrieveImageFromClipboardAsBase64('#txtEditor', event)
         };
 
         document.getElementById("txtKendoEditor").onpaste = function (event) {
             // nếu lấy cấu hình giữ format từ word của plugin nên xóa default
             event.preventDefault();
-            retrieveImageFromClipboardAsBase64('#txtKendoEditor', event, 'TINYMCE_EDITOR')
+            retrieveImageFromClipboardAsBase64('#txtKendoEditor', event, 'KENDO_EDITOR')
         };
+
 
         function retrieveImageFromClipboardAsBase64(elm, pasteEvent, pluginEditor, callback) {
             pluginEditor = pluginEditor || "";
@@ -269,12 +250,12 @@
                             // 1. Cách 1 hiển thị lại văn bản word từ nội dung rtf,
                             // có nhiều chổ không giữ được format word, nên làm với cách 2
                             switch (pluginEditor) {
-                                case KENDO_EDITOR:
+                                case "KENDO_EDITOR":
                                     $(elm).data("kendoEditor").value(div.innerHTML);
                                     break;
-                                case TINYMCE_EDITOR:
-                                    tinymce.get("txtMCEContent").getBody().innerHTML = div.innerHTML;
-                                case CK_EDITOR:
+                                case "TINYMCE_EDITOR":
+                                    tinymce.get("txtMCEEditor").getBody().innerHTML = div.innerHTML;
+                                case "CK_EDITOR":
                                     break;
                                 default:
                                     $(elm).html(div.innerHTML);
